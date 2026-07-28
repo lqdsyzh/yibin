@@ -1,145 +1,146 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <!-- 关键设置：width=1200 让网页变宽，实现电脑版那种随意缩放的效果 -->
-    <meta name="viewport" content="width=1200, initial-scale=1.0, user-scalable=yes">
-    <title>李权的个人主页 - 宜宾印象</title>
-    <style>
-        /* --- 全局样式 --- */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5; /* 浅灰背景，护眼 */
-            font-family: 'Microsoft YaHei', sans-serif;
-            overflow-x: hidden; /* 防止横向滚动条出现 */
-        }
+  <meta charset="UTF-8">
+  <!-- 响应式视口：在移动设备上按设备宽度显示，用户仍可缩放 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>魅力宜宾 · 深色主题</title>
+  <meta name="description" content="魅力宜宾 — 宜宾介绍（深色主题展示），展示城市名片、历史人文、特色美食与特产。">
+  <link rel="icon" href="favicon.ico">
+  <style>
+    /* 全局：深色主题 */
+    :root{
+      --bg: #0b1117;
+      --surface: #0f1720;
+      --muted: #98a0aa;
+      --text: #e6eef8;
+      --accent: #c50e29; /* 保留品牌色调偏暗 */
+      --accent-strong: #ff6b73;
+      --card: #0b1220;
+      --highlight: #12202b;
+    }
 
-        /* --- 核心容器：限制内容宽度，居中显示 --- */
-        .container {
-            width: 800px; /* 中间内容宽度固定 */
-            margin: 0 auto; /* 自动居中 */
-            background-color: white;
-            min-height: 100vh;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1); /* 给中间加个阴影，像张纸 */
-            position: relative;
-            z-index: 10; /* 保证内容在装饰球上面 */
-        }
+    html,body { height:100%; }
+    body {
+      font-family: "Microsoft YaHei", sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      color: var(--text);
+      background: linear-gradient(180deg, #071018 0%, var(--bg) 100%);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
 
-        /* --- 头部设计 --- */
-        header {
-            background: linear-gradient(90deg, #2c3e50, #4ca1af); /* 深蓝渐变，显得稳重 */
-            color: white;
-            padding: 40px;
-            text-align: center;
-            border-bottom: 5px solid #fff;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 36px;
-            letter-spacing: 2px;
-        }
-        header p {
-            font-size: 18px;
-            opacity: 0.8;
-            margin-top: 10px;
-        }
+    header {
+      background: linear-gradient(90deg, rgba(197,14,41,0.95), rgba(139,10,30,0.95));
+      color: white;
+      padding: 2.5rem 0;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+    h1 { font-size: 2.2rem; margin: 0 0 0.3rem 0; }
+    .subtitle { font-size: 1rem; font-weight: 400; color: rgba(255,255,255,0.9); margin:0; }
 
-        /* --- 内容区域 --- */
-        .content {
-            padding: 40px;
-            font-size: 18px;
-            line-height: 1.8;
-            color: #333;
-        }
-        
-        /* 模拟一点小错误的“手写风”边框 */
-        .card {
-            border: 2px solid #333;
-            padding: 20px;
-            margin-bottom: 20px;
-            background: #fffdf0; /* 微微泛黄的纸张色 */
-            box-shadow: 5px 5px 0px #333; /* 硬阴影，复古感 */
-            transform: rotate(-1deg); /* 故意歪一点点，显得不单调 */
-        }
+    /* 容器：响应式，最大宽度 800px */
+    .container {
+      max-width: 800px;
+      width: min(95%, 800px);
+      margin: 1.5rem auto;
+      padding: 1.25rem;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: 10px;
+      box-shadow: 0 6px 24px rgba(2,6,12,0.6);
+      backdrop-filter: blur(4px);
+    }
 
-        /* --- 左右两边的装饰（魔法光球） --- */
-        .decoration {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(40px); /* 模糊处理，营造氛围感 */
-            z-index: 1; /* 放在底层 */
-            animation: float 6s infinite ease-in-out; /* 上下浮动动画 */
-        }
+    h2 {
+      color: var(--accent-strong);
+      border-bottom: 2px solid rgba(255,107,107,0.08);
+      padding-bottom: 0.5rem;
+      margin-top: 1.25rem;
+    }
 
-        /* 左边的球 */
-        .ball-left {
-            top: 20%;
-            left: 5%;
-            width: 300px;
-            height: 300px;
-            background: rgba(76, 161, 175, 0.4); /* 青色 */
-        }
+    p {
+      margin-bottom: 1rem;
+      text-align: justify;
+      color: var(--text);
+    }
 
-        /* 右边的球 */
-        .ball-right {
-            bottom: 20%;
-            right: 5%;
-            width: 400px;
-            height: 400px;
-            background: rgba(255, 107, 107, 0.4); /* 红色 */
-            animation-delay: 2s; /* 错开时间浮动 */
-        }
+    .highlight {
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
+      border-left: 4px solid var(--accent);
+      padding: 1rem;
+      margin: 1.25rem 0;
+      font-style: italic;
+      color: var(--muted);
+      border-radius: 6px;
+    }
 
-        /* 定义浮动动画 */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-30px); }
-            100% { transform: translateY(0px); }
-        }
+    footer {
+      background: #05060a;
+      color: rgba(255,255,255,0.85);
+      text-align: center;
+      padding: 1rem 0;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+    }
 
-        /* --- 强制隐藏底部 AI 提示语 --- */
-        .ai-generated-footer, 
-        [class*="footer"], 
-        div[style*="position: fixed"][style*="bottom"] {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            overflow: hidden !important;
-        }
+    /* 小屏优化：减少内边距，隐藏大背景阴影以节省绘制开销 */
+    @media (max-width: 480px) {
+      header { padding: 1.25rem 0; }
+      h1 { font-size: 1.6rem; }
+      .container { margin: 1rem 0; padding: 1rem; border-radius: 0; box-shadow: none; }
+    }
 
-    </style>
+    /* 可访问性：尊重用户减少动画设置 */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+
+    /* 提高对比度的可选类（如果需要更强对比可手动添加） */
+    .high-contrast h1, .high-contrast p { color: #ffffff; }
+
+    /* 小修饰，链接样式（若后续添加链接） */
+    a { color: var(--accent-strong); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+  </style>
 </head>
 <body>
+  <header>
+    <h1>中国酒都 · 宜宾</h1>
+    <p class="subtitle">万里长江第一城，历史文化名城</p>
+  </header>
 
-    <!-- 左右装饰球 -->
-    <div class="decoration ball-left"></div>
-    <div class="decoration ball-right"></div>
+  <main class="container" role="main">
+    <section aria-labelledby="card-1">
+      <h2 id="card-1">城市名片</h2>
+      <p>宜宾，位于四川省南部，是长江上游的重要城市。这里历史悠久，文化灿烂，是五粮液的故乡，也是中国历史文化名城和中国优秀旅游城市。</p>
+    </section>
 
-    <!-- 中间主要内容区 -->
-    <div class="container">
-        <header>
-            <h1>李权的作品展示</h1>
-            <p>七年级 · 信息技术课作业</p>
-        </header>
+    <section aria-labelledby="card-2">
+      <h2 id="card-2">历史人文</h2>
+      <p>宜宾拥有超过2200年的建城史，是古南方丝绸之路的重要节点。这里诞生了中国共产党早期领导人之一的<strong>赵一曼</strong>女士。僰人悬棺、哪吒行宫等历史遗迹也为这座城市增添了神秘色彩。</p>
+    </section>
 
-        <div class="content">
-            <div class="card">
-                <h2>📍 关于我的家乡：宜宾</h2>
-                <p>这里是万里长江第一城。你可以试着用两根手指在屏幕上捏合，看看这个网页是不是像电脑端一样可以自由缩放？</p>
-            </div>
-
-            <div class="card" style="transform: rotate(1deg);">
-                <h2>🚀 我的想法</h2>
-                <p>我觉得网页不应该只是死板的文字。所以我加了左右两边的光球，还有这种稍微歪一点的卡片，看起来更有个性。</p>
-                <p><strong>操作提示：</strong>现在的模式是“桌面模式”，字可能会比较小，但这正是为了让你体验“缩放”的乐趣！</p>
-            </div>
-            
-            <p style="text-align: center; margin-top: 50px; color: #999;">
-                —— 完 ——
-            </p>
-        </div>
+    <div class="highlight" role="note" aria-label="要点提示">
+      宜宾是“万里长江第一城”，金沙江与岷江在此汇合，始称“长江”。
     </div>
 
+    <section aria-labelledby="card-3">
+      <h2 id="card-3">特色美食</h2>
+      <p>提到宜宾美食，首当其冲的便是<em>宜宾燃面</em>，以其油重无水、点火即燃的特点闻名。当然，还有以<em>李庄白肉</em>为代表的长江河鲜、以及各种地道的川南小吃，让人回味无穷。</p>
+    </section>
+
+    <section aria-labelledby="card-4">
+      <h2 id="card-4">名优特产</h2>
+      <p>宜宾最著名的特产莫过于<em>五粮液</em>，作为中国白酒的代表之一，享誉世界。此外，<em>宜宾芽菜</em>、<em>珙县蜡染</em>等也是极具地方特色的伴手礼。</p>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <p>欢迎来到魅力宜宾！</p>
+  </footer>
 </body>
 </html>
