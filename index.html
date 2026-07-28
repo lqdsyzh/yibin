@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 关键设置：width=1200 让网页变宽，实现电脑版那种随意缩放的效果 -->
+    <meta name="viewport" content="width=1200, initial-scale=1.0, user-scalable=yes">
+    <title>李权的个人主页 - 宜宾印象</title>
+    <style>
+        /* --- 全局样式 --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5; /* 浅灰背景，护眼 */
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow-x: hidden; /* 防止横向滚动条出现 */
+        }
+
+        /* --- 核心容器：限制内容宽度，居中显示 --- */
+        .container {
+            width: 800px; /* 中间内容宽度固定 */
+            margin: 0 auto; /* 自动居中 */
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1); /* 给中间加个阴影，像张纸 */
+            position: relative;
+            z-index: 10; /* 保证内容在装饰球上面 */
+        }
+
+        /* --- 头部设计 --- */
+        header {
+            background: linear-gradient(90deg, #2c3e50, #4ca1af); /* 深蓝渐变，显得稳重 */
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 5px solid #fff;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+            letter-spacing: 2px;
+        }
+        header p {
+            font-size: 18px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        /* --- 内容区域 --- */
+        .content {
+            padding: 40px;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        /* 模拟一点小错误的“手写风”边框 */
+        .card {
+            border: 2px solid #333;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fffdf0; /* 微微泛黄的纸张色 */
+            box-shadow: 5px 5px 0px #333; /* 硬阴影，复古感 */
+            transform: rotate(-1deg); /* 故意歪一点点，显得不单调 */
+        }
+
+        /* --- 左右两边的装饰（魔法光球） --- */
+        .decoration {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(40px); /* 模糊处理，营造氛围感 */
+            z-index: 1; /* 放在底层 */
+            animation: float 6s infinite ease-in-out; /* 上下浮动动画 */
+        }
+
+        /* 左边的球 */
+        .ball-left {
+            top: 20%;
+            left: 5%;
+            width: 300px;
+            height: 300px;
+            background: rgba(76, 161, 175, 0.4); /* 青色 */
+        }
+
+        /* 右边的球 */
+        .ball-right {
+            bottom: 20%;
+            right: 5%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 107, 107, 0.4); /* 红色 */
+            animation-delay: 2s; /* 错开时间浮动 */
+        }
+
+        /* 定义浮动动画 */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* --- 强制隐藏底部 AI 提示语 --- */
+        .ai-generated-footer, 
+        [class*="footer"], 
+        div[style*="position: fixed"][style*="bottom"] {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 左右装饰球 -->
+    <div class="decoration ball-left"></div>
+    <div class="decoration ball-right"></div>
+
+    <!-- 中间主要内容区 -->
+    <div class="container">
+        <header>
+            <h1>李权的作品展示</h1>
+            <p>七年级 · 信息技术课作业</p>
+        </header>
+
+        <div class="content">
+            <div class="card">
+                <h2>📍 关于我的家乡：宜宾</h2>
+                <p>这里是万里长江第一城。你可以试着用两根手指在屏幕上捏合，看看这个网页是不是像电脑端一样可以自由缩放？</p>
+            </div>
+
+            <div class="card" style="transform: rotate(1deg);">
+                <h2>🚀 我的想法</h2>
+                <p>我觉得网页不应该只是死板的文字。所以我加了左右两边的光球，还有这种稍微歪一点的卡片，看起来更有个性。</p>
+                <p><strong>操作提示：</strong>现在的模式是“桌面模式”，字可能会比较小，但这正是为了让你体验“缩放”的乐趣！</p>
+            </div>
+            
+            <p style="text-align: center; margin-top: 50px; color: #999;">
+                —— 完 ——
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
