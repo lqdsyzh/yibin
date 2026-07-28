@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>李权 — 待办清单</title>
+  <meta name="description" content="李权的简单待办页，与主站风格统一（深蓝主题）。" />
+  <link rel="icon" href="/docs/liquan/favicon.ico" />
+  <style>
+    /* 与主站 docs/liquan/index.html 保持配色一致的深蓝主题 */
+    :root{ --bg: #031027; --card:#07263d; --text:#eaf6ff; --muted:#9fb2c8; --accent:#2b79ff; --danger:#ff6b6b }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: "Microsoft YaHei", Arial, sans-serif; background:linear-gradient(180deg,#021021,#031027); color:var(--text);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; padding:2rem; display:flex; align-items:center; justify-content:center;
+    }
+
+    .card{
+      width:min(880px,98%); background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:1.25rem 1.5rem;
+      box-shadow:0 10px 40px rgba(2,8,20,0.6);
+    }
+
+    header{display:flex; align-items:center; gap:1rem}
+    h1{margin:0;font-size:1.4rem;color:var(--accent)}
+    .subtitle{margin:0;color:var(--muted);font-size:0.95rem}
+
+    .controls{display:flex; gap:.5rem; align-items:center; margin-top:0.75rem}
+    .input{display:flex; gap:.5rem}
+    input[type="text"]{flex:1;padding:.6rem .75rem;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:var(--text)}
+    button{background:var(--accent);color:white;border:0;padding:.5rem .85rem;border-radius:8px;cursor:pointer}
+    button.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
+
+    .list{margin-top:1rem}
+    .task{display:flex;align-items:center;gap:.75rem;padding:.6rem;border-radius:8px;margin-bottom:.5rem;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008))}
+    .task.completed{opacity:.6;text-decoration:line-through}
+    .title{flex:1;min-width:0}
+    .meta{color:var(--muted);font-size:0.9rem}
+
+    footer{margin-top:1rem;color:var(--muted);font-size:0.9rem;text-align:right}
+
+    @media(max-width:640px){.controls{flex-direction:column}.input{flex-direction:column}button{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="title">
+    <header>
+      <div>
+        <h1 id="title">李权的第二个作品 · 待办</h1>
+        <p class="subtitle">一个简洁的待办清单，数据保存在你的浏览器（localStorage）。</p>
+      </div>
+    </header>
+
+    <section class="controls" aria-label="添加任务">
+      <div class="input">
+        <input id="taskInput" type="text" placeholder="写下要做的事，然后按回车或点击添加" aria-label="新任务" />
+        <button id="addBtn">添加</button>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:.5rem;align-items:center">
+        <div class="meta" id="count">0 项</div>
+        <button id="clearBtn" class="ghost">清除已完成</button>
+      </div>
+    </section>
+
+    <section class="list" id="taskList" aria-live="polite" aria-label="任务列表">
+      <!-- 任务渲染到这里 -->
+    </section>
+
+    <footer>
+      图片/视频与主站分开存放；此页样式已与主站深蓝主题对齐。
+    </footer>
+  </main>
+
+  <script>
+    (function(){
+      const STORAGE_KEY = 'liquan-todo-v1';
+      let tasks = [];
+
+      const input = document.getElementById('taskInput');
+      const addBtn = document.getElementById('addBtn');
+      const taskList = document.getElementById('taskList');
+      const countEl = document.getElementById('count');
+      const clearBtn = document.getElementById('clearBtn');
+
+      const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+
+      function load(){
+        try{ const raw = localStorage.getItem(STORAGE_KEY); tasks = raw ? JSON.parse(raw) : []; } catch(e){ tasks = []; }
+      }
+      function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+
+      function render(){
+        taskList.innerHTML = '';
+        if(tasks.length === 0){
+          const e = document.createElement('div'); e.className = 'meta'; e.textContent = '当前没有任务，试试添加一条吧。'; taskList.appendChild(e);
+        } else {
+          tasks.forEach(t => taskList.appendChild(renderTask(t)));
+        }
+        countEl.textContent = tasks.length + ' 项';
+      }
+
+      function renderTask(t){
+        const row = document.createElement('div'); row.className = 'task' + (t.completed? ' completed':'');
+        row.dataset.id = t.id;
+
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!t.completed;
+        cb.addEventListener('change', () => { t.completed = cb.checked; t.updated = Date.now(); save(); render(); });
+        row.appendChild(cb);
+
+        const title = document.createElement('div'); title.className = 'title'; title.textContent = t.title; title.tabIndex = 0;
+        title.addEventListener('dblclick', () => startEdit(title, t));
+        row.appendChild(title);
+
+        const del = document.createElement('button'); del.textContent = '删除'; del.className = 'ghost'; del.addEventListener('click', () => {
+          tasks = tasks.filter(x=>x.id !== t.id); save(); render();
+        });
+        row.appendChild(del);
+
+        return row;
+      }
+
+      function startEdit(el, t){
+        const inp = document.createElement('input'); inp.type = 'text'; inp.value = t.title; inp.style.width = '100%';
+        el.replaceWith(inp); inp.focus(); inp.select();
+        function commit(){
+          const v = inp.value.trim(); if(v){ t.title = v; t.updated = Date.now(); save(); render(); } else { tasks = tasks.filter(x=>x.id !== t.id); save(); render(); }
+        }
+        inp.addEventListener('blur', commit);
+        inp.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') commit(); if(e.key === 'Escape') render(); });
+      }
+
+      addBtn.addEventListener('click', addFromInput);
+      input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') addFromInput(); });
+
+      function addFromInput(){
+        const v = input.value.trim(); if(!v) return input.focus(); const t = { id: uid(), title: v, completed:false, created: Date.now(), updated: Date.now() };
+        tasks.unshift(t); input.value = ''; save(); render(); input.focus();
+      }
+
+      clearBtn.addEventListener('click', ()=>{ tasks = tasks.filter(t=>!t.completed); save(); render(); });
+
+      // init
+      load(); render();
+      // expose for debug
+      window._todo = { tasks, save, render };
+    })();
+  </script>
+</body>
+</html>
