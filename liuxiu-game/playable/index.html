@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>刘秀直招 — 可玩原型</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>刘秀直招</h1>
+      <p class="subtitle">严肃历史向 · 移动优先 · 本地排行榜</p>
+    </header>
+
+    <section class="hud">
+      <div class="attrs">
+        <div>朝廷: <span id="court">50</span></div>
+        <div>士族: <span id="gentry">50</span></div>
+        <div>民望: <span id="popular">50</span></div>
+        <div>军心: <span id="military">50</span></div>
+        <div>财政: <span id="treasury">50</span></div>
+      </div>
+      <div class="controls">
+        <select id="difficulty">
+          <option value="hard">史实（Hard）</option>
+          <option value="normal" selected>普通（Normal）</option>
+          <option value="easy">休闲（Easy）</option>
+        </select>
+        <button id="startBtn">开始</button>
+        <button id="pauseBtn" disabled>暂停</button>
+      </div>
+    </section>
+
+    <main id="gameArea">
+      <div class="panel" id="eventPanel">
+        <h2 id="eventTitle">等待开始</h2>
+        <div id="eventText">按“开始”触发历史事件。每个事件都带有《后汉书》《资治通鉴》的来源编号。</div>
+        <div id="options"></div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="leaderboard">
+          <h3>本地排行榜</h3>
+          <ol id="leaderList"></ol>
+        </div>
+        <div class="settings">
+          <button id="historyBtn">查看史料（仓库）</button>
+          <button id="musicBtn">背景音乐 开</button>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <small>注：本原型为 Phase‑2 playable demo，史料原文与事件注释见 docs/originals.md（feature/liuxiu-full 分支）。</small>
+    </footer>
+
+    <audio id="bgm" loop src="https://cdn.jsdelivr.net/gh/xiangyuecn/Recorderjs@master/examples/media/relax.mp3"></audio>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
