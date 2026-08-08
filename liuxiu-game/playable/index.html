@@ -3,61 +3,646 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>刘秀直招 — 可玩原型</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>位面之子：东汉开国沉浮录</title>
+  <meta name="description" content="新莽末年至东汉初年，纯文字沉浸式历史叙事策略游戏。" />
+  <style>
+    :root{
+      --bg:#0c0f12;
+      --surface:#14191f;
+      --card:#1b222b;
+      --muted:#8a919c;
+      --text:#e6e2d8;
+      --gold:#c7a25f;
+      --red:#a84a3f;
+      --green:#5a8a6a;
+      --blue:#5e7a9e;
+      --accent:#bfa374;
+      --border:#2a333d;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family:"Noto Serif SC","Source Han Serif SC","SimSun",serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.75;
+      font-size:16px;
+    }
+    .app{max-width:900px;margin:0 auto;padding:16px;min-height:100%;display:flex;flex-direction:column}
+    header{text-align:center;padding:20px 0 10px;border-bottom:1px solid var(--border);margin-bottom:16px}
+    h1{font-size:1.9rem;margin:0;color:var(--gold);letter-spacing:2px}
+    .subtitle{font-size:.9rem;color:var(--muted);margin-top:4px}
+    .age-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--gold);color:var(--gold);padding:2px 10px;border-radius:999px;font-size:.8rem;margin-top:10px}
+    .age-badge::before{content:"12+";font-weight:700;background:var(--gold);color:#000;padding:1px 6px;border-radius:999px}
+    .hud{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;background:var(--surface);padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:16px}
+    .hud div{text-align:center;font-size:.85rem;color:var(--muted)}
+    .hud span{display:block;font-size:1.1rem;color:var(--text);font-weight:700}
+    .talents{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:var(--surface);padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:16px}
+    .talents div{text-align:center;font-size:.8rem;color:var(--muted)}
+    .talents span{display:block;font-size:1rem;color:var(--accent);font-weight:700}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;flex:1}
+    .panel h2{font-size:1.3rem;color:var(--gold);margin:0 0 12px;border-bottom:1px solid var(--border);padding-bottom:8px}
+    .panel h3{font-size:1.05rem;color:var(--accent);margin:18px 0 8px}
+    .panel p{margin:0 0 14px;text-align:justify}
+    .small{font-size:.85rem;color:var(--muted)}
+    .options{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+    button{
+      background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:12px 16px;
+      font-family:inherit;font-size:.95rem;cursor:pointer;text-align:left;transition:all .15s;
+    }
+    button:hover{background:#232b36;border-color:var(--gold)}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    button.primary{background:var(--gold);color:#1a1510;border-color:var(--gold);font-weight:700}
+    button.primary:hover{background:#d4b06d}
+    .choice-effect{font-size:.8rem;color:var(--muted);display:block;margin-top:4px}
+    .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    @media(max-width:600px){.grid-2{grid-template-columns:1fr}.hud{grid-template-columns:repeat(3,1fr)}.talents{grid-template-columns:repeat(2,1fr)}}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:border-color .15s}
+    .card:hover{border-color:var(--gold)}
+    .card.selected{border-color:var(--gold);background:#232b36}
+    .card h4{color:var(--accent);margin:0 0 6px;font-size:1rem}
+    .card .tags{font-size:.75rem;color:var(--muted);margin-bottom:6px}
+    .card p{font-size:.85rem;color:var(--text);margin:0}
+    .hidden{display:none}
+    .log{font-size:.85rem;color:var(--muted);border-top:1px solid var(--border);margin-top:16px;padding-top:10px}
+    .log div{margin-bottom:6px}
+    footer{text-align:center;font-size:.75rem;color:var(--muted);padding:20px 0 10px;border-top:1px solid var(--border);margin-top:16px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .tab{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:.8rem;cursor:pointer}
+    .tab.active{background:var(--gold);color:#1a1510;border-color:var(--gold);font-weight:700}
+    .scrollbox{max-height:55vh;overflow-y:auto;padding-right:8px}
+    .scrollbox::-webkit-scrollbar{width:6px}
+    .scrollbox::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    .ending-title{font-size:1.5rem;color:var(--gold);text-align:center;margin:20px 0}
+    .ending-desc{font-size:1rem;color:var(--text);text-align:center;margin-bottom:20px}
+    .attr-change{color:var(--gold)}
+  </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>刘秀直招</h1>
-      <p class="subtitle">严肃历史向 · 移动优先 · 本地排行榜</p>
-    </header>
+<div class="app">
+  <header>
+    <h1>位面之子：东汉开国沉浮录</h1>
+    <p class="subtitle">新莽末年至东汉初年 · 纯文字沉浸式历史叙事策略游戏</p>
+    <div class="age-badge">适合十二周岁及以上用户 · 历史战争题材 · 虚拟决策</div>
+  </header>
 
-    <section class="hud">
-      <div class="attrs">
-        <div>朝廷: <span id="court">50</span></div>
-        <div>士族: <span id="gentry">50</span></div>
-        <div>民望: <span id="popular">50</span></div>
-        <div>军心: <span id="military">50</span></div>
-        <div>财政: <span id="treasury">50</span></div>
+  <section class="hud" id="hud">
+    <div>朝廷<br><span id="court">50</span></div>
+    <div>士族<br><span id="gentry">50</span></div>
+    <div>民望<br><span id="popular">50</span></div>
+    <div>军心<br><span id="military">50</span></div>
+    <div>府库<br><span id="treasury">50</span></div>
+  </section>
+
+  <section class="talents" id="talentBar">
+    <div>文韬<br><span id="wen">0</span></div>
+    <div>理政<br><span id="li">0</span></div>
+    <div>武略<br><span id="wu">0</span></div>
+    <div>体质<br><span id="ti">0</span></div>
+  </section>
+
+  <main class="panel" id="mainPanel">
+    <div id="screen-start">
+      <h2>乱世将启</h2>
+      <p>新莽天凤年间，灾异屡见，饥馑连年。王莽改制，天下骚动；刘氏宗室，隐忍待发。绿林起于荆襄，赤眉扰于青徐，豪杰并起，群雄逐鹿。</p>
+      <p>汝不过一介布衣，或宗室远裔，或草莽豪侠，或士族子弟，或游学书生，或商贾游侠。值此大乱之世，当何以自处？是辅汉室以兴，还是割据自雄？是保境安民，还是马革裹尸？</p>
+      <p class="small">本作为史实向文字策略游戏，无爽文开挂设定。每一次抉择，皆会写入史册。</p>
+      <div class="options">
+        <button class="primary" onclick="toCreate()">创建角色，步入乱世</button>
+        <button onclick="showManual()">查阅游戏系统说明</button>
       </div>
-      <div class="controls">
-        <select id="difficulty">
-          <option value="hard">史实（Hard）</option>
-          <option value="normal" selected>普通（Normal）</option>
-          <option value="easy">休闲（Easy）</option>
-        </select>
-        <button id="startBtn">开始</button>
-        <button id="pauseBtn" disabled>暂停</button>
+    </div>
+
+    <div id="screen-create" class="hidden">
+      <h2>一、角色创建：择汝出身</h2>
+      <div class="small" style="margin-bottom:12px">五类出身决定初始天赋、人脉与特殊能力。鼠标悬停或点击以选择。</div>
+      <div class="grid-2" id="originList"></div>
+      <div class="options">
+        <button class="primary" id="confirmOrigin" onclick="confirmOrigin()" disabled>确认出身</button>
+        <button onclick="toStart()">返回</button>
       </div>
-    </section>
+    </div>
 
-    <main id="gameArea">
-      <div class="panel" id="eventPanel">
-        <h2 id="eventTitle">等待开始</h2>
-        <div id="eventText">按“开始”触发历史事件。每个事件都带有《后汉书》《资治通鉴》的来源编号。</div>
-        <div id="options"></div>
+    <div id="screen-timeline" class="hidden">
+      <h2>二、选择时间线</h2>
+      <div class="small" style="margin-bottom:12px">四条独立时间线，决定开局难度与时代背景。</div>
+      <div id="timelineList"></div>
+      <div class="options">
+        <button class="primary" id="confirmTimeline" onclick="confirmTimeline()" disabled>进入乱世</button>
+        <button onclick="toCreate()">重选出身</button>
       </div>
+    </div>
 
-      <aside class="sidebar">
-        <div class="leaderboard">
-          <h3>本地排行榜</h3>
-          <ol id="leaderList"></ol>
-        </div>
-        <div class="settings">
-          <button id="historyBtn">查看史料（仓库）</button>
-          <button id="musicBtn">背景音乐 开</button>
-        </div>
-      </aside>
-    </main>
+    <div id="screen-game" class="hidden">
+      <h2 id="eventTitle"></h2>
+      <div id="eventText"></div>
+      <div id="eventSource" class="small" style="margin-top:8px;color:#7a8a9a"></div>
+      <div class="options" id="eventOptions"></div>
+      <div class="log" id="gameLog"></div>
+    </div>
 
-    <footer>
-      <small>注：本原型为 Phase‑2 playable demo，史料原文与事件注释见 docs/originals.md（feature/liuxiu-full 分支）。</small>
-    </footer>
+    <div id="screen-ending" class="hidden">
+      <div class="ending-title" id="endingTitle"></div>
+      <div class="ending-desc" id="endingDesc"></div>
+      <div id="endingStats" class="small" style="text-align:center;margin-bottom:20px"></div>
+      <div class="options" style="text-align:center">
+        <button class="primary" onclick="restartGame()">再书青史</button>
+        <button onclick="toStart()">返回主界面</button>
+      </div>
+    </div>
 
-    <audio id="bgm" loop src="https://cdn.jsdelivr.net/gh/xiangyuecn/Recorderjs@master/examples/media/relax.mp3"></audio>
-  </div>
+    <div id="screen-manual" class="hidden">
+      <div class="tabs">
+        <span class="tab active" onclick="showManualTab('manual-origin')">出身</span>
+        <span class="tab" onclick="showManualTab('manual-talent')">天赋</span>
+        <span class="tab" onclick="showManualTab('manual-timeline')">时间线</span>
+        <span class="tab" onclick="showManualTab('manual-office')">官制</span>
+        <span class="tab" onclick="showManualTab('manual-core')">玩法</span>
+        <span class="tab" onclick="showManualTab('manual-route')">流派</span>
+        <span class="tab" onclick="showManualTab('manual-events')">大事</span>
+        <span class="tab" onclick="showManualTab('manual-endings')">结局</span>
+      </div>
+      <div class="scrollbox" id="manualContent"></div>
+      <div class="options">
+        <button onclick="toStart()">返回主界面</button>
+      </div>
+    </div>
+  </main>
 
-  <script src="game.js"></script>
+  <footer>
+    <small>《位面之子：东汉开国沉浮录》· 史实向文字策略游戏 · 适合12周岁以上用户</small>
+  </footer>
+</div>
+
+<script>
+/* ============== 游戏数据 ============== */
+const origins = [
+  {
+    id:'zongshi',name:'南阳宗室',
+    tags:'武略+2 理政+2 文韬+1 体质+1',
+    desc:'你是长沙定王刘发后裔，与刘秀同宗同支，血脉疏远但族谱可考。家族在南阳有薄田数十亩，世代耕读。新莽篡汉后，刘氏宗室备受打压，族中长辈隐忍度日，暗中教导子弟兵法韬略以待时变。',
+    talent:{wen:1,li:2,wu:2,ti:1},
+    network:'南阳刘氏族人，包括刘縯、刘秀兄弟的远房关系。',
+    gift:{name:'汉室正统',desc:'招募汉室遗民、号召复汉义兵时效率提升30%；但新莽官员将你视为重点监视对象。'}
+  },
+  {
+    id:'lvlin',name:'绿林豪侠',
+    tags:'武略+4 体质+2 文韬0 理政0',
+    desc:'你出身江夏乡野，新莽天凤年间饥荒连年，官府催科不止，你一怒之下杀了下乡催税的亭长，遁入绿林山落草。数年间与王匡、王凤等绿林豪杰结下生死之交。',
+    talent:{wen:0,li:0,wu:4,ti:2},
+    network:'绿林军中多名头目，熟悉山中地形和游击战术。',
+    gift:{name:'草莽义气',desc:'率领流民武装、山贼归附时士气加成20%；但在朝廷官员眼中永远是贼寇出身，仕途晋升难度增加。'}
+  },
+  {
+    id:'shizu',name:'河北士族',
+    tags:'理政+3 文韬+2 武略+1 体质0',
+    desc:'你出身河北真定名门，祖上世代为官，王莽改制后家族虽受打击但仍保留大量田产和门客。自幼受经学教育，通晓《尚书》《春秋》，兼习骑射。',
+    talent:{wen:2,li:3,wu:1,ti:0},
+    network:'河北豪强如耿纯、刘植家族，拥有丰厚的初始钱粮支持。',
+    gift:{name:'郡望之门',desc:'在河北地区招募兵马、筹措粮草时效率提升25%；与地方大族交涉时好感度加成。'}
+  },
+  {
+    id:'shusheng',name:'游学书生',
+    tags:'文韬+4 理政+2 体质0 武略0',
+    desc:'你出身普通农家，少年时游学长安太学，师从名儒，习《论语》《孝经》。王莽篡位后太学废弛，你怀揣经书回到乡里，以教书为业。天下大乱后，你决心以所学救世。',
+    talent:{wen:4,li:2,wu:0,ti:0},
+    network:'若干太学同窗和儒林名士，包括刘秀在太学时的故交。',
+    gift:{name:'经世致用',desc:'制定政策、安抚百姓、教化地方时效率提升20%；撰写檄文、劝降书信成功率提高。'}
+  },
+  {
+    id:'shangren',name:'商贾游侠',
+    tags:'体质+3 武略+2 理政+1 文韬0',
+    desc:'你本是宛城商人之后，新莽改制禁绝私商，家产被没收，父兄死于狱中。你隐姓埋名往来于南阳、颍川之间，以贩盐为掩护，实则接济各地反莽义士。',
+    talent:{wen:0,li:1,wu:2,ti:3},
+    network:'各地商贾暗线和江湖游侠，掌握秘密商路和情报网络。',
+    gift:{name:'江湖耳目',desc:'获取各地军情、粮价波动、势力动向的情报速度提升40%，可提前预判战局变化。'}
+  }
+];
+
+const timelines = [
+  {
+    id:'tianfeng',name:'天凤四年 · 天下初乱',
+    diff:'低',
+    desc:'这一年荆州饥荒，饥民以野草树皮为食，王匡王凤在绿林山聚众起兵，拉开天下大乱的序幕。你作为地方亭长、乡绅或游侠，第一次面对流民潮与官府镇压的两难选择。各地小股叛乱频发但尚未形成燎原之势，新莽朝廷仍在试图控制局面。你需要在维持地方、保护百姓与站队造反之间小心周旋。',
+    feature:'适合新手熟悉乱世生存机制，学习基础军政运营。'
+  },
+  {
+    id:'gengshi1',name:'更始元年 · 绿林立帝',
+    diff:'中',
+    desc:'绿林军攻入南阳，刘縯刘秀兄弟起兵响应，新莽四十万大军围困昆阳。天下局势急转直下，各路豪强纷纷观望。你此时或是一县之长欲守土自保，或是宗室子弟欲起兵复汉，或是地方豪强欲择主而事。绿林军与新莽军主力的决战即将爆发，你的每一个抉择都可能将你引向截然不同的命运。',
+    feature:'适合有一定经验的玩家，在群雄初起的夹缝中寻找自己的位置。'
+  },
+  {
+    id:'gengshi2',name:'更始二年 · 刘秀北渡',
+    diff:'高',
+    desc:'昆阳之战后刘縯被杀，刘秀隐忍北渡黄河，只身入河北招抚。此时的河北豪强林立，王郎在邯郸称帝，铜马赤眉等流民军数以十万计四处劫掠，真定刘扬拥兵观望。你身处河北这片最混乱的战场，面对的是流民军围城、豪强逼婚联姻、王郎政权的招揽以及刘秀势力的渗透。资源极度匮乏但机会也最大。',
+    feature:'适合挑战高难度的玩家。'
+  },
+  {
+    id:'jianwu1',name:'建武元年 · 群雄逐鹿',
+    diff:'极高',
+    desc:'刘秀在鄗城称帝，东汉初立但天下远未平定。赤眉军占据长安焚毁宫室，隗嚣割据陇右，公孙述在蜀中称帝，各地流寇山贼不计其数。你此时已是一方郡守或将领，需要面对的是真正的逐鹿天下——是追随刘秀一统汉室，还是割据一方以待时变，或是投靠其他势力分一杯羹。最终结局将决定你在史书中的位置。',
+    feature:'适合追求极致的资深玩家，这是真正考验所有能力积累的终局时间线。'
+  }
+];
+
+const endings = [
+  {key:'yunting',name:'云台绘像 · 从龙功臣',cond:s=>s.court>=70&&s.military>=70,desc:'你辅佐刘秀定鼎天下，名列云台功臣之侧，画像留于南宫，子孙世袭爵禄。'},
+  {key:'guixi',name:'功成身退 · 归隐故里',cond:s=>s.popular>=70&&s.court<60,desc:'你厌倦了朝堂倾轧，上书归隐，回到乡里教书育人。地方百姓为你立祠，史家称你为“知进退”。'},
+  {key:'zhansi',name:'战死沙场 · 马革裹尸',cond:s=>s.military<=15,desc:'你率部血战，力竭阵亡。尸骨虽葬于乱岗，然部曲感佩你的忠义，世代相传你的事迹。'},
+  {key:'geju',name:'割据一方 · 裂土称王',cond:s=>s.military>=75&&s.gentry>=60&&s.court<50,desc:'你拥兵自重，据地自守。虽未得天下，却在乱世中保一方安宁，史称“偏霸”。'},
+  {key:'fulu',name:'兵败被俘 · 慷慨赴死',cond:s=>s.military<=25&&s.popular>=50,desc:'大势已去，你被敌军俘获。面对劝降，你慨然不屈，终以身殉节。'},
+  {key:'xiangdi',name:'降敌失节 · 遗臭万年',cond:s=>s.court<=20&&s.popular<=30,desc:'你在绝境中选择投降新主。虽得保全，却被旧部唾骂，史笔如刀，留下千古骂名。'},
+  {key:'neidou',name:'溺于内斗 · 被政敌所害',cond:s=>s.gentry<=20&&s.court>=60,desc:'你功高震主，又不懂收敛，终被政敌构陷，死于牢狱或毒酒。'},
+  {key:'xunli',name:'循吏典范 · 造福一方',cond:s=>s.popular>=75&&s.li>=6,desc:'你不求闻达，专心治理地方。兴水利、劝农桑、抚流民，死后百姓罢市相送。'},
+  {key:'piaoling',name:'乱世飘零 · 不知所终',cond:s=>true,desc:'乱世人如飘蓬。关于你的最后记载，只余一句“后不知所终”，成为时代的尘埃。'}
+];
+
+/* ============== 事件库 ============== */
+const events = {
+  tianfeng:[
+    {
+      id:'T1',title:'流民过境',source:'《汉书》《后汉书》流民载道',
+      text:'春荒严重，邻县饥民数百人扶老携幼涌入你所在乡亭。县中存粮有限，开仓则官库空虚，不开仓则饥民势必为盗。乡中父老与县吏各执一词，催促你决断。',
+      options:[
+        {text:'开仓赈济，安抚流民',effect:{popular:12,treasury:-10,court:-5},log:'你开仓放粮，饥民感泣，称你为“再生父母”。'},
+        {text:'坚壁清野，拒之门外',effect:{popular:-10,court:5,military:5},log:'你下令关闭乡门，流民怨声载道，亦有数名壮士趁夜投奔绿林。'},
+        {text:'招募精壮，编为乡勇',effect:{military:10,treasury:-5,court:-3},log:'你择其壮勇者入伍，既消弭隐患，亦增强乡防。'}
+      ]
+    },
+    {
+      id:'T2',title:'官府催科',source:'《资治通鉴》天凤年间税役繁苛',
+      text:'县丞奉郡守之命，下乡催征秋粮。乡民已无余粮，县丞却威胁以“通贼”论处。你作为地方有头脸之人，被夹在百姓与官府之间。',
+      options:[
+        {text:'代民缴纳，换取人心',effect:{treasury:-15,popular:10,gentry:5},log:'你以私财代贫户完税，乡民感恩，士绅亦高看你一眼。'},
+        {text:'据理力争，拖延时日',effect:{wen:1,court:-5,popular:5},log:'你引经据典，说动县丞宽限半月，百姓得以喘息。'},
+        {text:'暗通绿林，准备反莽',effect:{court:-15,military:8,popular:-3},log:'你遣心腹入绿林山，与反莽义士暗通声气。'}
+      ]
+    },
+    {
+      id:'T3',title:'绿林来使',source:'《后汉书·刘玄刘盆子列传》',
+      text:'王匡遣人秘密造访，邀你率乡中子弟加入绿林军。来使言：天下苦莽久矣，刘氏当兴。你若应允，便是从贼；若拒绝，恐招来报复。',
+      options:[
+        {text:'举族相投，共举义旗',effect:{court:-20,military:15,popular:5},log:'你率部投奔绿林，与王匡、王凤结为兄弟。'},
+        {text:'婉言谢绝，暗中资助',effect:{treasury:-10,court:-5,gentry:5},log:'你未公开从贼，但暗中输送粮草，以备将来。'},
+        {text:'缚使报官，以明心迹',effect:{court:15,military:-5,popular:-10},log:'你将使者缚送县廷，官府嘉许，然乡人自此与你离心。'}
+      ]
+    },
+    {
+      id:'T4',title:'宗族之争',source:'《后汉书》南阳宗室聚散',
+      text:'同宗中有人主张隐忍待时，有人主张即刻起兵。族长请你裁决，你的态度将影响宗族未来的走向。',
+      options:[
+        {text:'主张隐忍，积蓄实力',effect:{li:1,treasury:8,court:5},log:'你劝族人暂避锋芒，暗中购置兵甲、囤积粮草。'},
+        {text:'联络刘縯，起兵响应',effect:{military:12,court:-10,popular:5},log:'你与刘縯、刘秀兄弟取得联系，宗室子弟纷纷执戈。'}
+      ]
+    }
+  ],
+  gengshi1:[
+    {
+      id:'G1',title:'昆阳危急',source:'《后汉书·光武帝纪上》《资治通鉴》卷三十八',
+      text:'新莽大司徒王寻、大司空王邑率四十二万大军压境，旌旗辎重千里不绝。昆阳城中仅数千人，诸将惶恐，欲散归诸城。你作为城中一校尉或县吏，必须决断。',
+      options:[
+        {text:'请缨随刘秀突围求援',effect:{wu:1,military:10,court:-5,ti:-2},log:'你随刘秀率十三骑出城南门，冒死突围。此行九死一生，然事成则名垂青史。'},
+        {text:'死守城池，等待奇迹',effect:{military:5,popular:5,ti:-3},log:'你率众加固城防，以死拒之。昆阳城小，然士气可用。'},
+        {text:'趁夜弃城，保全实力',effect:{military:-10,treasury:5,court:-10,popular:-10},log:'你弃城而走，虽保全性命，却为天下笑。'}
+      ]
+    },
+    {
+      id:'G2',title:'更始立帝',source:'《后汉书·刘玄传》',
+      text:'绿林诸将议立天子。刘縯威名素著，然更始将军刘玄懦弱易制。南阳豪杰多欲立刘縯，而新市、平林诸将惮其威，主张立刘玄。你身处其中，必须表态。',
+      options:[
+        {text:'拥立刘縯，以功论尊',effect:{court:5,gentry:10,military:5},log:'你公开支持刘縯，与南阳豪杰同声。'},
+        {text:'附和更始，韬光养晦',effect:{court:10,popular:-5,gentry:-5},log:'你选择沉默从众，避免成为众矢之的。'},
+        {text:'中立观望，两不相助',effect:{gentry:5,court:-3},log:'你称病不赴会，保存实力，然两边皆生嫌隙。'}
+      ]
+    },
+    {
+      id:'G3',title:'借粮之争',source:'《后汉书·光武帝纪》',
+      text:'义军新破宛城，缴获颇丰，然诸将争抢财货，百姓嗷嗷待哺。刘縯命你主持分粮，此事极易得罪人。',
+      options:[
+        {text:'均分给民，收买人心',effect:{popular:15,treasury:-10,gentry:-5},log:'你将半数粮食用以赈济贫民，百姓称颂，豪强却暗恨。'},
+        {text:'优先犒军，稳固兵权',effect:{military:10,treasury:-10,popular:-5},log:'你以粮养兵，士气大振，然民间怨声载道。'},
+        {text:'登记造册，按功分赏',effect:{li:1,treasury:-5,gentry:8,military:3},log:'你依功次分配，虽不能尽如人意，却平息了大部分纷争。'}
+      ]
+    }
+  ],
+  gengshi2:[
+    {
+      id:'H1',title:'刘縯之死',source:'《后汉书·光武帝纪上》《资治通鉴》卷三十九',
+      text:'更始帝猜忌刘縯功高，借故将其杀害。刘秀闻讯，不敢发丧，反至更始帝前谢罪。你作为刘秀部属，见他深夜独坐帐中，面色如常而目含血丝。',
+      options:[
+        {text:'劝其起兵复仇，为兄雪恨',effect:{military:10,court:-20,popular:5},log:'你慷慨陈词，刘秀却摇头曰：“事未可知，慎言。”然心中已记下你的忠诚。'},
+        {text:'劝其韬光养晦，北渡河北',effect:{wen:1,court:10,gentry:5},log:'你建言隐忍北渡，刘秀深以为然，对你倍加信任。'},
+        {text:'默然不语，静待其变',effect:{court:3,gentry:3},log:'你未置可否，刘秀亦不追问。乱世之中，沉默亦是自保。'}
+      ]
+    },
+    {
+      id:'H2',title:'北渡黄河',source:'《后汉书·光武帝纪上》',
+      text:'刘秀以破虏将军行大司马事，持节北渡黄河，仅带冯异等数骑。你随行之，河北豪强或观望，或拥王郎，或自立山寨。第一站至邯郸，形势危殆。',
+      options:[
+        {text:'持节招抚，示以汉德',effect:{wen:1,popular:10,court:5},log:'你随刘秀宣慰郡县，多城归附。'},
+        {text:'结交真定，谋联姻刘扬',effect:{gentry:15,military:10,treasury:-5},log:'你牵线真定王刘扬，刘秀娶其甥女郭圣通，河北大势遂定。'},
+        {text:'清剿流民军，以战立威',effect:{wu:1,military:12,popular:-5,court:-3},log:'你随军击铜马、破高湖，虽狠辣，却震慑河北。'}
+      ]
+    },
+    {
+      id:'H3',title:'王郎追兵',source:'《后汉书·光武帝纪上》',
+      text:'王郎称帝于邯郸，悬赏十万户购刘秀首级。刘秀一行仓皇南奔，至呼沱河无船可渡，追兵渐近。天寒地冻，人马乏食。',
+      options:[
+        {text:'冒冰渡河，护主先行',effect:{ti:-2,court:10,military:5},log:'你率勇士凿冰渡河，刘秀得脱，你几乎冻毙。'},
+        {text:'断后阻敌，血战待毙',effect:{military:10,ti:-5,court:5},log:'你率数十骑断后，虽伤亡惨重，却为主公赢得时间。'},
+        {text:'遣人诈降，迷惑追兵',effect:{wen:1,court:5,gentry:5},log:'你设下疑兵之计，追兵迟疑，主力得以远遁。'}
+      ]
+    }
+  ],
+  jianwu1:[
+    {
+      id:'J1',title:'鄗城称帝',source:'《后汉书·光武帝纪上》',
+      text:'建武元年六月，刘秀即皇帝位于鄗南，改元建武。你作为随驾旧臣，面临新的站队：是倾心辅佐新朝，还是暗中保存旧部势力？',
+      options:[
+        {text:'劝进表忠，奉还兵权',effect:{court:15,military:-10,gentry:5},log:'你上表劝进，并主动交出部曲，刘秀嘉纳，拜你为列卿。'},
+        {text:'拥兵自守，观望形势',effect:{military:10,court:-10,gentry:5},log:'你托言地方未靖，请求留镇外郡。刘秀许之，然心中已有戒备。'},
+        {text:'请缨西征，追击赤眉',effect:{wu:1,military:8,court:5,ti:-2},log:'你请命西入关，与邓禹、冯异共击赤眉。'}
+      ]
+    },
+    {
+      id:'J2',title:'陇右隗嚣',source:'《后汉书·隗嚣传》',
+      text:'隗嚣割据陇右，遣子入侍，实怀二心。朝廷议讨，有人认为当抚，有人认为当剿。你身居中枢，参与廷议。',
+      options:[
+        {text:'主抚，以德怀远',effect:{wen:1,court:5,popular:5,gentry:-3},log:'你主张遣使厚赐，隗嚣暂表臣服，边境得安。'},
+        {text:'主剿，以威服人',effect:{military:10,court:5,treasury:-10,popular:-5},log:'你力主出兵，虽耗费粮饷，然挫其锐气。'}
+      ]
+    },
+    {
+      id:'J3',title:'蜀中公孙述',source:'《后汉书·公孙述传》',
+      text:'公孙述据蜀称帝，凭剑阁之险，固守不降。刘秀欲招降之，公孙述拒不答。朝议或攻或守，你将如何建言？',
+      options:[
+        {text:'建议水陆并进，攻其腹心',effect:{wu:1,military:10,treasury:-15,court:5},log:'你献策命岑彭、吴汉溯江而上，最终公孙述败亡。'},
+        {text:'建议围而不攻，待其内乱',effect:{li:1,treasury:5,gentry:5,military:3},log:'你主张屯兵要害，蜀中粮尽，公孙述部将多生异心。'}
+      ]
+    },
+    {
+      id:'J4',title:'退功臣进文吏',source:'《后汉书·光武帝纪下》',
+      text:'天下渐定，刘秀行“退功臣而进文吏”之策，厚封列侯而夺其兵柄。你功高权重，亦在被议之列。',
+      options:[
+        {text:'主动交权，求封列侯',effect:{court:15,military:-15,treasury:10,gentry:5},log:'你上书请罢兵权，刘秀封你为列侯，食邑优厚。'},
+        {text:'托病不朝，暗中结纳',effect:{gentry:10,court:-10,military:5},log:'你称病不出，旧部仍聚于门下，然已触帝王之忌。'},
+        {text:'据理力争，不肯放权',effect:{military:5,court:-15,gentry:-10},log:'你抗辩有功，刘秀暂忍，然猜忌日深。'}
+      ]
+    }
+  ]
+};
+
+/* ============== 状态 ============== */
+let state = {
+  origin:null,timeline:null,
+  court:50,gentry:50,popular:50,military:50,treasury:50,
+  wen:0,li:0,wu:0,ti:0,
+  turn:0,route:null,log:[]
+};
+
+let currentEvent = null;
+
+/* ============== 工具函数 ============== */
+function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+function refreshHud(){
+  ['court','gentry','popular','military','treasury'].forEach(k=>{
+    document.getElementById(k).textContent = Math.round(state[k]);
+  });
+  document.getElementById('wen').textContent = state.wen;
+  document.getElementById('li').textContent = state.li;
+  document.getElementById('wu').textContent = state.wu;
+  document.getElementById('ti').textContent = state.ti;
+}
+function showScreen(id){
+  document.querySelectorAll('[id^="screen-"]').forEach(el=>el.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+function addLog(text){
+  state.log.unshift(text);
+  const box = document.getElementById('gameLog');
+  if(box) box.innerHTML = state.log.slice(0,8).map(t=>'<div>· '+t+'</div>').join('');
+}
+function applyEffect(effect){
+  for(const [k,v] of Object.entries(effect)){
+    if(['wen','li','wu','ti'].includes(k)) state[k] += v;
+    else state[k] = clamp(state[k]+v,0,100);
+  }
+  refreshHud();
+}
+
+/* ============== 页面切换 ============== */
+function toStart(){showScreen('screen-start');}
+function toCreate(){
+  showScreen('screen-create');
+  renderOrigins();
+}
+function renderOrigins(){
+  const box = document.getElementById('originList');
+  box.innerHTML = origins.map(o=>`
+    <div class="card" data-id="${o.id}" onclick="selectOrigin('${o.id}')">
+      <h4>${o.name}</h4>
+      <div class="tags">${o.tags}</div>
+      <p>${o.desc}</p>
+      <p class="small"><strong>人脉：</strong>${o.network}</p>
+      <p class="small"><strong>天赋「${o.gift.name}」：</strong>${o.gift.desc}</p>
+    </div>
+  `).join('');
+}
+function selectOrigin(id){
+  state.origin = origins.find(o=>o.id===id);
+  document.querySelectorAll('#originList .card').forEach(c=>c.classList.toggle('selected',c.dataset.id===id));
+  document.getElementById('confirmOrigin').disabled = false;
+}
+function confirmOrigin(){
+  if(!state.origin) return;
+  state.wen += state.origin.talent.wen;
+  state.li += state.origin.talent.li;
+  state.wu += state.origin.talent.wu;
+  state.ti += state.origin.talent.ti;
+  if(state.origin.id==='shizu'){state.treasury=70;state.gentry=65;}
+  if(state.origin.id==='shangren'){state.treasury=60;}
+  if(state.origin.id==='shusheng'){state.gentry=60;}
+  if(state.origin.id==='lvlin'){state.military=60;state.court=35;}
+  if(state.origin.id==='zongshi'){state.gentry=60;state.court=40;}
+  refreshHud();
+  renderTimelines();
+  showScreen('screen-timeline');
+}
+function renderTimelines(){
+  const box = document.getElementById('timelineList');
+  box.innerHTML = timelines.map(t=>`
+    <div class="card" data-id="${t.id}" onclick="selectTimeline('${t.id}')">
+      <h4>${t.name} <span style="color:${t.diff==='低'?'#5a8a6a':t.diff==='中'?'#c7a25f':t.diff==='高'?'#a84a3f':'#8a3f3f'}">难度：${t.diff}</span></h4>
+      <p>${t.desc}</p>
+      <p class="small"><strong>适合：</strong>${t.feature}</p>
+    </div>
+  `).join('');
+}
+function selectTimeline(id){
+  state.timeline = timelines.find(t=>t.id===id);
+  document.querySelectorAll('#timelineList .card').forEach(c=>c.classList.toggle('selected',c.dataset.id===id));
+  document.getElementById('confirmTimeline').disabled = false;
+}
+function confirmTimeline(){
+  if(!state.timeline) return;
+  state.turn = 0;
+  state.log = [];
+  addLog(`你以${state.origin.name}之身，踏入${state.timeline.name}。`);
+  nextEvent();
+}
+function nextEvent(){
+  const pool = events[state.timeline.id];
+  if(!pool || state.turn >= pool.length){
+    endGame('normal');
+    return;
+  }
+  currentEvent = pool[state.turn];
+  state.turn++;
+  renderEvent(currentEvent);
+  showScreen('screen-game');
+}
+function renderEvent(ev){
+  document.getElementById('eventTitle').textContent = ev.title;
+  document.getElementById('eventText').textContent = ev.text;
+  document.getElementById('eventSource').textContent = '史料来源：'+ev.source;
+  const optBox = document.getElementById('eventOptions');
+  optBox.innerHTML = ev.options.map((opt,idx)=>{
+    let efText = '';
+    const parts = [];
+    for(const [k,v] of Object.entries(opt.effect)){
+      const name = {court:'朝廷',gentry:'士族',popular:'民望',military:'军心',treasury:'府库',wen:'文韬',li:'理政',wu:'武略',ti:'体质'}[k]||k;
+      parts.push(`${name}${v>0?'+':''}${v}`);
+    }
+    if(parts.length) efText = '<span class="choice-effect">预计影响：'+parts.join('，')+'</span>';
+    return `<button onclick="chooseOption(${idx})">${opt.text}${efText}</button>`;
+  }).join('');
+}
+function chooseOption(idx){
+  const opt = currentEvent.options[idx];
+  applyEffect(opt.effect);
+  addLog(opt.log);
+  if(checkDeath()) return;
+  nextEvent();
+}
+function checkDeath(){
+  if(state.court<=0){endGame('court0');return true;}
+  if(state.military<=0){endGame('military0');return true;}
+  if(state.popular<=0){endGame('popular0');return true;}
+  if(state.treasury<=0){endGame('treasury0');return true;}
+  if(state.ti<3 && state.timeline.id!=='tianfeng' && Math.random()<0.3){endGame('freeze');return true;}
+  return false;
+}
+function endGame(reason){
+  let title,desc;
+  if(reason==='court0'){title='获罪朝廷，身死囹圄';desc='你与当权者彻底决裂，或遭通缉，或下狱论死。乱世之中，失去政治庇护者，鲜有幸免。';}
+  else if(reason==='military0'){title='军心瓦解，众叛亲离';desc='你麾下将士离散，刀枪不足以自保。最终或被敌军所擒，或死于乱刀之下。';}
+  else if(reason==='popular0'){title='民怨沸腾，失地丧众';desc:'你治下百姓流亡，无人再听你号令。地方豪强借机取而代之，你沦为孤家寡人。';}
+  else if(reason==='treasury0'){title='府库空虚，难以为继';desc:'无粮则无兵，无钱则无吏。你的势力因财政崩溃而烟消云散。';}
+  else if(reason==='freeze'){title='寒冬行军，冻毙道旁';desc:'你体质羸弱，又逢严寒，部卒冻伤减员，你亦染病不起。';}
+  else {
+    const end = endings.find(e=>e.cond(state)) || endings[endings.length-1];
+    title = end.name;
+    desc = end.desc;
+  }
+  document.getElementById('endingTitle').textContent = title;
+  document.getElementById('endingDesc').textContent = desc;
+  document.getElementById('endingStats').innerHTML =
+    `朝廷 ${Math.round(state.court)} · 士族 ${Math.round(state.gentry)} · 民望 ${Math.round(state.popular)} · 军心 ${Math.round(state.military)} · 府库 ${Math.round(state.treasury)}<br>`+
+    `文韬 ${state.wen} · 理政 ${state.li} · 武略 ${state.wu} · 体质 ${state.ti}`;
+  showScreen('screen-ending');
+}
+function restartGame(){
+  state = {origin:null,timeline:null,court:50,gentry:50,popular:50,military:50,treasury:50,wen:0,li:0,wu:0,ti:0,turn:0,route:null,log:[]};
+  refreshHud();
+  toStart();
+}
+
+/* ============== 游戏说明（完整设定文本） ============== */
+const manualData = {
+  'manual-origin':`
+    <h2>一、角色创建系统</h2>
+    <h3>出身一：南阳宗室</h3>
+    <p>你是长沙定王刘发后裔，与刘秀同宗同支，血脉疏远但族谱可考。家族在南阳有薄田数十亩，世代耕读。新莽篡汉后，刘氏宗室备受打压，族中长辈隐忍度日，暗中教导子弟兵法韬略以待时变。</p>
+    <p class="small">天赋侧重：武略+2、理政+2、文韬+1、体质+1。初始人脉可结识几位南阳刘氏族人，包括刘縯、刘秀兄弟的远房关系。自带天赋「汉室正统」——在招募汉室遗民、号召复汉义兵时效率提升30%，但被新莽官员视为重点监视对象。</p>
+    <h3>出身二：绿林豪侠</h3>
+    <p>你出身江夏乡野，新莽天凤年间饥荒连年，官府催科不止，你一怒之下杀了下乡催税的亭长，遁入绿林山落草。数年间与王匡、王凤等绿林豪杰结下生死之交。</p>
+    <p class="small">天赋侧重：武略+4、体质+2、文韬与理政均为0。初始人脉可结交绿林军中多名头目，熟悉山中地形和游击战术。自带天赋「草莽义气」——率领流民武装、山贼归附时士气加成20%，但在朝廷官员眼中永远是贼寇出身，仕途晋升难度增加。</p>
+    <h3>出身三：河北士族</h3>
+    <p>你出身河北真定名门，祖上世代为官，王莽改制后家族虽受打击但仍保留大量田产和门客。自幼受经学教育，通晓《尚书》《春秋》，兼习骑射。</p>
+    <p class="small">天赋侧重：理政+3、文韬+2、武略+1、体质为0。初始人脉可结交河北豪强如耿纯、刘植家族，拥有丰厚的初始钱粮支持。自带天赋「郡望之门」——在河北地区招募兵马、筹措粮草时效率提升25%，与地方大族交涉时好感度加成。</p>
+    <h3>出身四：游学书生</h3>
+    <p>你出身普通农家，少年时游学长安太学，师从名儒，习《论语》《孝经》。王莽篡位后太学废弛，你怀揣经书回到乡里，以教书为业。天下大乱后，你决心以所学救世。</p>
+    <p class="small">天赋侧重：文韬+4、理政+2、体质与武略均为0。初始人脉可结识若干太学同窗和儒林名士，包括刘秀在太学时的故交。自带天赋「经世致用」——在制定政策、安抚百姓、教化地方时效率提升20%，撰写檄文、劝降书信成功率提高。</p>
+    <h3>出身五：商贾游侠</h3>
+    <p>你本是宛城商人之后，新莽改制禁绝私商，家产被没收，父兄死于狱中。你隐姓埋名往来于南阳、颍川之间，以贩盐为掩护，实则接济各地反莽义士。</p>
+    <p class="small">天赋侧重：体质+3、武略+2、理政+1、文韬为0。初始人脉可结识各地商贾暗线和江湖游侠，掌握秘密商路和情报网络。自带天赋「江湖耳目」——获取各地军情、粮价波动、势力动向的情报速度提升40%，可提前预判战局变化。</p>
+  `,
+  'manual-talent':`
+    <h2>四维天赋属性</h2>
+    <p><strong>文韬</strong>——影响檄文撰写、谋略策划、与士人结交、经学辩论、招降劝降等事务。每一点文韬提升谋略成功率5%。</p>
+    <p><strong>理政</strong>——影响粮草筹措、户籍管理、赋税征收、水利兴修、安抚流民等政务。每一点理政提升政务效率5%。</p>
+    <p><strong>武略</strong>——影响领兵作战、城防攻守、骑射单挑、行军布阵等军事能力。每一点武略提升战场指挥成功率5%。</p>
+    <p><strong>体质</strong>——影响个人精力、长途奔袭耐受、伤病恢复、疫病抵抗。体质每一点增加精力值上限10点，体质低于3点时寒冬行军有概率冻伤减员。</p>
+    <p class="small">注：本原型以五维势力值（朝廷、士族、民望、军心、府库）为主要胜负判定，四维天赋在后续完整版中将影响事件成功率与特殊选项开放。</p>
+  `,
+  'manual-timeline':`
+    <h2>二、四条独立时间线</h2>
+    <h3>时间线一：王莽天凤四年，天下初乱</h3>
+    <p>这一年荆州饥荒，饥民以野草树皮为食，王匡王凤在绿林山聚众起兵，拉开天下大乱的序幕。你作为地方亭长、乡绅或游侠，第一次面对流民潮与官府镇压的两难选择。各地小股叛乱频发但尚未形成燎原之势，新莽朝廷仍在试图控制局面。你需要在维持地方、保护百姓与站队造反之间小心周旋。适合新手熟悉乱世生存机制，学习基础军政运营。难度评级：低。</p>
+    <h3>时间线二：更始元年，绿林立帝</h3>
+    <p>绿林军攻入南阳，刘縯刘秀兄弟起兵响应，新莽四十万大军围困昆阳。天下局势急转直下，各路豪强纷纷观望。你此时或是一县之长欲守土自保，或是宗室子弟欲起兵复汉，或是地方豪强欲择主而事。绿林军与新莽军主力的决战即将爆发，你的每一个抉择都可能将你引向截然不同的命运。适合有一定经验的玩家，在群雄初起的夹缝中寻找自己的位置。难度评级：中。</p>
+    <h3>时间线三：更始二年，刘秀北渡</h3>
+    <p>昆阳之战后刘縯被杀，刘秀隐忍北渡黄河，只身入河北招抚。此时的河北豪强林立，王郎在邯郸称帝，铜马赤眉等流民军数以十万计四处劫掠，真定刘扬拥兵观望。你身处河北这片最混乱的战场，面对的是流民军围城、豪强逼婚联姻、王郎政权的招揽以及刘秀势力的渗透。资源极度匮乏但机会也最大。适合挑战高难度的玩家。难度评级：高。</p>
+    <h3>时间线四：建武元年，群雄逐鹿</h3>
+    <p>刘秀在鄗城称帝，东汉初立但天下远未平定。赤眉军占据长安焚毁宫室，隗嚣割据陇右，公孙述在蜀中称帝，各地流寇山贼不计其数。你此时已是一方郡守或将领，需要面对的是真正的逐鹿天下——是追随刘秀一统汉室，还是割据一方以待时变，或是投靠其他势力分一杯羹。最终结局将决定你在史书中的位置。适合追求极致的资深玩家，这是真正考验所有能力积累的终局时间线。难度评级：极高。</p>
+  `,
+  'manual-office':`
+    <h2>三、东汉官职晋升体系</h2>
+    <p>玩家从地方小吏或低级军官起步，每三年一次的考功评议决定升降，军功可加速晋升。但需注意，东汉初年刘秀“退功臣而进文吏”，武将功高可能被解除兵权明升暗降。</p>
+    <p><strong>地方文官路线</strong>：县丞 → 县令 → 郡丞 → 太守 → 州刺史 → 大司农 → 司徒。</p>
+    <p><strong>武将路线</strong>：军侯 → 都尉 → 校尉 → 偏将军 → 裨将军 → 大将军。</p>
+    <p><strong>中央路线</strong>：郎官 → 尚书郎 → 侍中 → 尚书令 → 御史中丞 → 三公（司徒、司空、太尉）。</p>
+    <p class="small">本原型以事件决策决定势力消长，完整版将加入官职晋升与考功评议机制。</p>
+  `,
+  'manual-core':`
+    <h2>四、核心玩法模块</h2>
+    <p><strong>县域/郡域军政经营</strong>——开垦荒田、兴修水利、招抚流民、编户齐民、征收赋税、操练郡兵、修筑城防等二十余项政务决策。每次决策消耗精力值与时间，效果与玩家理政、武略属性正相关。</p>
+    <p><strong>幕府人才招募</strong>——乱世之中人才最重要。你可在治所设置招贤馆，招募在野名士、流落武将来投。六十余位正史人物拥有独立AI，包括邓禹、冯异、耿弇、吴汉、贾复、马援、寇恂等云台二十八将，以及隗嚣、公孙述、王郎等群雄。每人有专属性格、才能、忠诚度和政治倾向，需要用官职、钱财、联姻或理想感召来争取。</p>
+    <p><strong>军政决策</strong>——面对流民围城可招募义勇守城、坚壁清野、出城招抚或向上请援。面对流寇可选择剿灭、招安或收编。与周边势力可结盟、臣服、对抗或虚与委蛇。每一次军事行动都消耗粮草兵力，失败可能导致县城失守。</p>
+    <p><strong>经济系统</strong>——管理府库金银、仓储粮草、在籍人口、归附流民、郡兵数量等动态收支。灾年粮价飞涨，流民大量涌入会消耗存粮但可招募为兵。铁盐等战略物资影响武备制造。</p>
+  `,
+  'manual-route':`
+    <h2>五、三条流派玩法</h2>
+    <p><strong>复汉忠臣路线</strong>——一心辅佐刘秀重建汉室，以仁政收拢民心，以忠勇建功立业。百姓爱戴、同僚敬重，但功高震主时可能遭遇猜忌，需要在忠诚与自保之间寻找平衡。</p>
+    <p><strong>割据枭雄路线</strong>——在乱世中拥兵自重，联姻豪强、吞并周边、扩充地盘，最终或与刘秀分庭抗礼，或待价而沽。部下忠诚度与朝廷观感成反比，一旦打出反旗将四面树敌。</p>
+    <p><strong>隐逸名士路线</strong>——厌倦纷争，以保境安民为己任，不参与逐鹿之争，力求在乱世中守护一方百姓。可能最终被大势裹挟，也可能成功归隐山林，在史书中留下一笔清名。</p>
+  `,
+  'manual-events':`
+    <h2>六、关键历史事件</h2>
+    <p><strong>昆阳之战</strong>——新莽四十二万大军压境，你率数千人困守昆阳。是出城夜袭敌营以求奇迹，还是死守待援，抑或弃城突围？历史上刘秀率十三骑突围求援，你能重现这个传奇吗？</p>
+    <p><strong>刘縯之死</strong>——更始帝猜忌刘縯功高将其杀害，刘秀隐忍不发。你作为刘秀的部属，是劝其起兵复仇，还是劝其韬光养晦？你的建议将影响刘秀对你的信任。</p>
+    <p><strong>河北招抚</strong>——你随刘秀北渡黄河，只带数百人面对河北数十万流民军和各地豪强。如何在这片最混乱的土地上站稳脚跟？联姻真定刘扬获得支持，还是靠武力硬打出一条路？</p>
+  `,
+  'manual-endings':`
+    <h2>七、四十余种结局</h2>
+    <p>不存在完美路线，所有选择都将在史书中留下不同评价。</p>
+    <p>结局类型包括：云台绘像从龙功臣、功成身退归隐故里、战死沙场马革裹尸、割据一方裂土称王、兵败被俘慷慨赴死、降敌失节遗臭万年、溺于内斗被政敌所害、治理一方造福百姓成为循吏典范、乱世飘零不知所终等。</p>
+    <p class="small">本原型中已包含九种代表性结局，完整版将扩展至四十余种，并加入史臣评语与后世影响。</p>
+  `
+};
+
+function showManual(){
+  showManualTab('manual-origin');
+  showScreen('screen-manual');
+}
+function showManualTab(key){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.textContent===document.querySelector(`.tab[onclick*="${key}"]`).textContent));
+  document.getElementById('manualContent').innerHTML = manualData[key];
+}
+
+/* ============== 初始化 ============== */
+refreshHud();
+</script>
 </body>
 </html>
