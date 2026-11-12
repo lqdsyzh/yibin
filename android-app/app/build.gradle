@@ -1,0 +1,47 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.lqdsyzh.yibin'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.lqdsyzh.yibin"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(System.getenv('YIBIN_KEYSTORE') ?: "${rootDir}/yibin-release.jks")
+            storePassword System.getenv('YIBIN_KEYSTORE_PASSWORD') ?: 'yibin2026'
+            keyAlias System.getenv('YIBIN_KEY_ALIAS') ?: 'yibin'
+            keyPassword System.getenv('YIBIN_KEY_PASSWORD') ?: 'yibin2026'
+            enableV1Signing false
+            enableV2Signing true
+            enableV3Signing true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packagingOptions {
+        resources.excludes += ['META-INF/*']
+    }
+}
+
+dependencies {
+}

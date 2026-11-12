@@ -1,0 +1,14 @@
+buildscript {
+    repositories {
+        maven { url = uri("https://dl.google.com/dl/android/maven2") }
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.7.3'
+    }
+}
+
+tasks.register('clean', Delete) {
+    delete rootProject.layout.buildDirectory
+}

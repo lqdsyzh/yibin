@@ -38,6 +38,9 @@ jobs:
         with:
           # Upload entire repository
           path: '.'
+          # Android 工程不属于站点内容，排除以免发布构建脚本
+          exclude: |
+            android-app/
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
