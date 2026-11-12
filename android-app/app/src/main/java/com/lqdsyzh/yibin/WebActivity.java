@@ -73,8 +73,7 @@ public class WebActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri u = request.getUrl();
-                String host = u.getHost();
-                if (host != null && (host.endsWith("lqdsyzh.github.io") || host.equals("localhost"))) {
+                if (UrlPolicy.shouldStayInWebView(u.toString())) {
                     return false;
                 }
                 try {
